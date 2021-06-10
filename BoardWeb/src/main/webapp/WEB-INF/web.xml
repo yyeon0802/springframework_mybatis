@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	<!-- <servlet> <servlet-name>action</servlet-name> <servlet-class>com.springbook.view.controller.DispatcherServlet</servlet-class> 
+		</servlet> -->
+
+	<!-- springMVC DispatcherServlet사용 -->
+
+	<!-- springMVC DispatcherServlet encoding filter : filter-name => characterEncoding -->
+	<filter>
+		<filter-name>characterEncoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>EUC-KR</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>characterEncoding</filter-name>
+		<!-- 모든 .do 요청이 있을때 실행하라 -->
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+
+	<!-- 3)  Clinet가 서버에 요청(do)을 하게 되면, 서블릿 컨테이너는 DispathcerServlet 객체를 생성하고, 
+		4) Presnetation-layer.xml 파일을 로딩하여 두 번쨰 스프링 컨테이너를 구동한다. 이때 Controller 객체들이 메모리에 올라가게 된다.-->
+	
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/config/presentation-layer.xml</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<!-- src/main/resources에 위치한 applicationContext.xml을 ContextLoaderListener가 읽기 위한 위치 지정 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param> 
+	<!-- 1) 톰캣시작 : 서블릿컨테이너가 web.xml을 읽어  contextLoaderListener 생성후, 
+		 2) 이 객체가 applicationContext.xml을 로딩하여
+		 [RootContainer] 를 구동한다. 이때, Service 구현 클래스나 DAO 객체가 메모리에 생성된다.-->
+	
+	<!-- DispatcherServlet이 presentation-layer를 읽어 controller 객체를 생성하기 전, 
+		applicationContext를 읽어 비즈니스 컴포넌트impl을 메모리에 생성 하는 contextLoaderListener. 이는  서블릿컨테이너가 web.xml을 읽어 구동될때 자동으로 메모리에 생성된다.
+		즉, contextLoaderListener클래스는 클라이언트의 요청이 없어도 컨테이너가 구동 될때 pre-loading되는 객체이다. -->
+	<listener>  
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<!-- <servlet> <description></description> <display-name>hello</display-name> 
+		<servlet-name>hello</servlet-name> <servlet-class>hello.HelloServlet</servlet-class> 
+		</servlet> <servlet-mapping> <servlet-name>hello</servlet-name> <url-pattern>/hello.do</url-pattern> 
+		</servlet-mapping> -->
+
+</web-app>
